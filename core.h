@@ -2,17 +2,30 @@
 #define HYPERSET_H
 
 #include <string>
-#include <vector>
+#include <set>
+#include <map>
+#include <boost/foreach.hpp>
 #include "hyperset.h"
+#include "hyperset_types.h"
+
+using namespace std;
 
 namespace hyperset {
 
-using namespace std;
-using namespace boost;
+#define foreach                         BOOST_FOREACH
+typedef map<std::string, std::set<int32_t> > setmap_t;
 
-const string AND      = "and";
-const string OR       = "or";
-const string ONLY     = "only";
+void    calc(const setmap_t  &src, const vector<SetOp> & ops, 
+        set<int32_t> & result);
+
+void    clear(setmap_t &dst, const string &name);
+
+void    add(const setmap_t  &src,
+        const string &name,
+        const vector<int32_t> & values);
+
+void    save(const string &filename, const setmap_t & setmap);
+void    load(const string &filename, setmap_t &setmap);
 
 } // namespace
 #endif

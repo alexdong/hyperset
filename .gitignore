@@ -1,2 +1,8 @@
 gen-*
 tags
+*.o
+main.cc
+*.txt
+main
+test
+server
