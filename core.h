@@ -15,7 +15,7 @@ namespace hyperset {
 #define foreach                         BOOST_FOREACH
 typedef map<std::string, std::set<int32_t> > setmap_t;
 
-int32_t calc(setmap_t &src, vector<SetOp> & ops);
+int32_t calc(setmap_t &src, string ops);
 
 void    add(setmap_t  &src,
         string &name,

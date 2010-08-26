@@ -3,14 +3,8 @@
 namespace cpp hyperset
 namespace python hyperset
 
-// Input data structures
-struct SetOp {
-    1: string op,
-    2: list<string> sets,
-}
-
 service hyperset {
-    i32         count(1: list<SetOp> query),
+    i32         calc (1: list<string> query),
     i32         add  (1: string name, 2: list<i32> vals),
     i32         save (),
 }

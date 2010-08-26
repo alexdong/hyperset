@@ -13,79 +13,88 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
+#include <glog/logging.h>
+
 #include "core.h"
 
 namespace hyperset {
 
-int32_t calc(setmap_t &setmap, vector<SetOp> & ops) {
-    vector<int32_t> lhs, rhs, ihs;
+void _get_set_vector(setmap_t &setmap, string &name, 
+        stack<vector<int32_t> > &set_stack, 
+        vector<int32_t> &current) {
+    /**
+     * Get the data for the current set into a vector. 
+     * If the `name` is a '$', read the set data from the stack, 
+     * Otherwise, copy the data from the `setmap` into new vector.
+     */
+    if(name == "$") {
+        current = set_stack.top();
+        set_stack.pop(); 
+    } else {
+        current.reserve(setmap[name].size());
+        copy(setmap[name].begin(), setmap[name].end(),
+                back_inserter(current));
+    }
+}
+
+int32_t calc(setmap_t &setmap, string query) {
+    /**
+     * Execute query over the setmap.  
+     * The query is something like 
+     * union scr:0 scr:20; union geo:1 $
+     */
+
+    // Break a query into sub queries
+    vector<string> subqueries;
+    boost::split(subqueries, query, boost::is_any_of(string(";")));
+    LOG(INFO) << "Processing query: " << query;
+
+    vector<int32_t> current, next, result;
     stack<vector<int32_t> > set_stack;
-    unsigned int idx;
-    string name;
 
-    // Walk through the `SetOp` structure and process them
-    // one by one. 
-    foreach(SetOp & setop, ops) {
-        lhs.clear(); rhs.clear(); ihs.clear();
+    // Process each sub-query
+    foreach(string & subquery, subqueries) {
+        VLOG(1) << "Current sub query: " << subquery;
+        current.clear(); next.clear(); result.clear(); 
 
-        if(setop.op == "union") {
-            // union the first two sets into `lhs` to get started
-            set_union(setmap[setop.sets[0]].begin(), 
-                    setmap[setop.sets[0]].end(), 
-                    setmap[setop.sets[1]].begin(), 
-                    setmap[setop.sets[1]].end(),
-                    back_inserter(lhs));
+        // Break up the sub-queries into [op, *operand]
+        vector<string> tokens;
+        boost::algorithm::trim(subquery);
+        boost::split(tokens, subquery, boost::is_space());
+        string &op = tokens[0]; 
 
-            // now, union `lhs` with all the rest sets
-            for(idx = 2; idx <= setop.sets.size() - 1; ++idx) {
-                name = setop.sets[idx];
-                if(name == "$") {
-                    ihs = set_stack.top();
-                    set_stack.pop(); 
-                    set_union(lhs.begin(), lhs.end(),
-                        ihs.begin(), ihs.end(),
-                        back_inserter(rhs));
-                } else {
-                    set_union(lhs.begin(), lhs.end(),
-                        setmap[name].begin(), setmap[name].end(),
-                        back_inserter(rhs));
-                }
-                lhs = rhs; rhs.clear();
+        // Set operate the first two sets into `current`, then use 
+        // `current` to perform further operations with other sets. 
+        _get_set_vector(setmap, tokens[1], set_stack, current);
+        for(unsigned int idx = 2; idx < tokens.size(); ++idx) {
+            _get_set_vector(setmap, tokens[idx], set_stack, next);
+
+            if(op == "union") {
+                set_union(current.begin(), current.end(), 
+                        next.begin(), next.end(),
+                        back_inserter(result));
+            } else {  // if(tokens[0] == "intersect")        
+                set_intersection(current.begin(), current.end(), 
+                        next.begin(), next.end(),
+                        back_inserter(result));
             }
-        }
+            VLOG(2) << op << " " << current.size() << " " << next.size()
+                << "  => " << result.size();
 
-        if(setop.op == "intersect") {
-            // intersect the first two sets into `lhs` to get started
-            set_intersection(setmap[setop.sets[0]].begin(), 
-                    setmap[setop.sets[0]].end(), 
-                    setmap[setop.sets[1]].begin(), 
-                    setmap[setop.sets[1]].end(),
-                    back_inserter(lhs));
-
-            for(idx = 2; idx <= setop.sets.size() - 1 && !lhs.empty(); ++idx) {
-                name = setop.sets[idx];
-                if(name == "$") {
-                    ihs = set_stack.top(); 
-                    set_stack.pop();
-                    set_intersection(lhs.begin(), lhs.end(),
-                        ihs.begin(), ihs.end(),
-                        back_inserter(rhs));
-                } else {
-                    set_intersection(lhs.begin(), lhs.end(),
-                        setmap[name].begin(), setmap[name].end(),
-                        back_inserter(rhs));
-                }
-                lhs = rhs; rhs.clear(); ihs.clear();
-            }
+            current.clear(); current.reserve(result.size());
+            copy(result.begin(), result.end(), back_inserter(current));
+            result.clear(); next.clear();
         }
 
         // push the current set result onto the stack and move on 
         // to the next `SetOp` operation set.
-        set_stack.push(lhs);
+        VLOG(1) << "Current SetOp result length: " << current.size();
+        set_stack.push(current);
+        VLOG(1) << "Stack.size(): " << set_stack.size();
     } // foreach
 
-    ihs = set_stack.top();
-    return ihs.size();
+    current = set_stack.top();
+    return current.size();
 }
 
 void save(string &filename, setmap_t &setmap) {
@@ -115,7 +124,7 @@ void load(string &filename, setmap_t &setmap) {
     // now, read line by line with each one a set
     while(getline(fin, line)) {
         tokens.clear();
-        boost::split(tokens, line, boost::is_from_range(' ', ' '));
+        boost::split(tokens, line, boost::is_space());
 
         // first field is always the set name
         name = tokens[0];
