@@ -22,11 +22,6 @@ class hypersetHandler : virtual public hypersetIf {
             // Your initialization goes here
         }
 
-        void calc(std::set<int32_t> & _return, const std::vector<SetOp> & query) {
-            // Your implementation goes here
-            printf("calc\n");
-        }
-
         int32_t count(const std::vector<SetOp> & query) {
             // Your implementation goes here
             printf("count\n");

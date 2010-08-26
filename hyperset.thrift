@@ -10,7 +10,6 @@ struct SetOp {
 }
 
 service hyperset {
-    set<i32>    calc (1: list<SetOp> query),
     i32         count(1: list<SetOp> query),
     i32         add  (1: string name, 2: list<i32> vals),
     i32         save (),
