@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <stdio.h>
 #include <map>
 #include <set>
@@ -15,6 +16,75 @@
 #include "core.h"
 
 namespace hyperset {
+
+int32_t calc(const setmap_t &setmap, const vector<SetOp> & ops) {
+    vector<int32_t> lhs, rhs, ihs;
+    stack<vector<int32_t> > set_stack;
+    unsigned int idx;
+    string name;
+
+    // Walk through the `SetOp` structure and process them
+    // one by one. 
+    foreach(const SetOp & setop, ops) {
+        lhs.clear(); rhs.clear(); ihs.clear();
+
+        if(setop.op == "union") {
+            // union the first two sets into `lhs` to get started
+            set_union(setmap[setops.sets[0]].begin(), 
+                    setmap[setops.sets[0]].end(), 
+                    setmap[setops.sets[1]].begin(), 
+                    setmap[setops.sets[1]].end(),
+                    back_inserter(lhs));
+
+            // now, union `lhs` with all the rest sets
+            for(idx = 2; idx <= setop.sets.size() - 1; ++idx) {
+                name = setop.sets[idx];
+                if(name == "$") {
+                    ihs = set_stack.pop(); 
+                    set_union(lhs.begin(), lhs.end(),
+                        ihs.begin(), ihs.end(),
+                        back_inserter(rhs));
+                } else {
+                    set_union(lhs.begin(), lhs.end(),
+                        setmap[name].begin(), setmap[name].end(),
+                        back_inserter(rhs));
+                }
+                lhs = rhs; rhs.clear();
+            }
+        }
+
+        if(setop.op == "intersect") {
+            // intersect the first two sets into `lhs` to get started
+            set_intersection(setmap[setops.sets[0]].begin(), 
+                    setmap[setops.sets[0]].end(), 
+                    setmap[setops.sets[1]].begin(), 
+                    setmap[setops.sets[1]].end(),
+                    back_inserter(lhs));
+
+            for(idx = 2; idx <= setop.sets.size() - 1 && !lhs.empty(); ++idx) {
+                name = setop.sets[idx];
+                if(name == "$") {
+                    ihs = set_stack.pop(); 
+                    set_intersection(lhs.begin(), lhs.end(),
+                        ihs.begin(), ihs.end(),
+                        back_inserter(rhs));
+                } else {
+                    set_intersection(lhs.begin(), lhs.end(),
+                        setmap[name].begin(), setmap[name].end(),
+                        back_inserter(rhs));
+                }
+                lhs = rhs; rhs.clear(); ihs.clear();
+            }
+        }
+
+        // push the current set result onto the stack and move on 
+        // to the next `SetOp` operation set.
+        set_stack.push(lhs);
+    } // foreach
+
+    ihs = set_stack.pop();
+    return ihs.size();
+}
 
 void save(const string &filename, const setmap_t &setmap) {
     /**
