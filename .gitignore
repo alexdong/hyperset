@@ -1,8 +1,10 @@
 gen-*
 tags
-*.o
-main.cc
-*.txt
-main
+main*
 test
 server
+hyperset
+*.db
+*.txt
+*.o
+*.pyc

@@ -113,6 +113,7 @@ void save(string &filename, setmap_t &setmap) {
         fout << endl;
     }
     fout.close();
+    LOG(INFO) << "Saved " << setmap.size() << " sets";
 }
 
 void load(string &filename, setmap_t &setmap) {
@@ -137,23 +138,15 @@ void load(string &filename, setmap_t &setmap) {
         }
     }
     fin.close();
-}
-
-void clear(setmap_t &src,
-        string &name) {
-    // Return no update if we can't find the set given the `name`
-    if(src.find(name) == src.end()) return;
-
-    src[name].clear();
+    LOG(INFO) << "Loaded " << setmap.size() << " sets";
 }
 
 void add(setmap_t  &src, const string &name, const vector<int32_t> & values) {
-    // Return no update if we can't find the set given the `name`
-    if(src.find(name) == src.end()) return;
-
     BOOST_FOREACH(int32_t val, values) {
         src[name].insert(val);
     }
+    LOG(INFO) << "Added " << values.size() << " values to set: " << name;
+    LOG(INFO) << "Set current size: " << src[name].size();
 }
 
 } // namespace

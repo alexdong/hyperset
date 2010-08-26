@@ -27,7 +27,9 @@ class hypersetHandler : virtual public hyperset::hypersetIf {
     public:
         hypersetHandler(const string &db) {
             m_db = db;
+            LOG(INFO) << "Loading from file: " << m_db;
             hyperset::load(m_db, m_setmap);
+            LOG(INFO) << "Hyperset ready";
         }
 
         int32_t calc(const string& query) {
@@ -51,7 +53,7 @@ class hypersetHandler : virtual public hyperset::hypersetIf {
 
 DEFINE_int32(hyperset_port, 9091, 
         "Which port hyperset server listens on");
-DEFINE_string(hyperset_db, "/var/lib/hyperset.db", 
+DEFINE_string(hyperset_db, "set.db", 
         "Where to put the database file. ");
 int main(int argc, char **argv) {
     google::InitGoogleLogging(argv[0]);
@@ -66,8 +68,14 @@ int main(int argc, char **argv) {
             new TBinaryProtocolFactory());
 
     TNonblockingServer server(processor, protocolFactory, FLAGS_hyperset_port);
-    LOG(INFO) << "hyperserver begining at port " << FLAGS_hyperset_port;
-    server.serve();
+    LOG(INFO) << "Hyperset begining at port " << FLAGS_hyperset_port;
 
+    try {
+        server.serve();
+    } catch(std::exception const& e) {
+        LOG(INFO) << "Exception in main: %s" << e.what();
+    }
+
+    LOG(INFO) << "Hyperset quitting";
     return 0;
 }
