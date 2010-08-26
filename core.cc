@@ -17,7 +17,7 @@
 
 namespace hyperset {
 
-int32_t calc(const setmap_t &setmap, const vector<SetOp> & ops) {
+int32_t calc(setmap_t &setmap, vector<SetOp> & ops) {
     vector<int32_t> lhs, rhs, ihs;
     stack<vector<int32_t> > set_stack;
     unsigned int idx;
@@ -25,22 +25,23 @@ int32_t calc(const setmap_t &setmap, const vector<SetOp> & ops) {
 
     // Walk through the `SetOp` structure and process them
     // one by one. 
-    foreach(const SetOp & setop, ops) {
+    foreach(SetOp & setop, ops) {
         lhs.clear(); rhs.clear(); ihs.clear();
 
         if(setop.op == "union") {
             // union the first two sets into `lhs` to get started
-            set_union(setmap[setops.sets[0]].begin(), 
-                    setmap[setops.sets[0]].end(), 
-                    setmap[setops.sets[1]].begin(), 
-                    setmap[setops.sets[1]].end(),
+            set_union(setmap[setop.sets[0]].begin(), 
+                    setmap[setop.sets[0]].end(), 
+                    setmap[setop.sets[1]].begin(), 
+                    setmap[setop.sets[1]].end(),
                     back_inserter(lhs));
 
             // now, union `lhs` with all the rest sets
             for(idx = 2; idx <= setop.sets.size() - 1; ++idx) {
                 name = setop.sets[idx];
                 if(name == "$") {
-                    ihs = set_stack.pop(); 
+                    ihs = set_stack.top();
+                    set_stack.pop(); 
                     set_union(lhs.begin(), lhs.end(),
                         ihs.begin(), ihs.end(),
                         back_inserter(rhs));
@@ -55,16 +56,17 @@ int32_t calc(const setmap_t &setmap, const vector<SetOp> & ops) {
 
         if(setop.op == "intersect") {
             // intersect the first two sets into `lhs` to get started
-            set_intersection(setmap[setops.sets[0]].begin(), 
-                    setmap[setops.sets[0]].end(), 
-                    setmap[setops.sets[1]].begin(), 
-                    setmap[setops.sets[1]].end(),
+            set_intersection(setmap[setop.sets[0]].begin(), 
+                    setmap[setop.sets[0]].end(), 
+                    setmap[setop.sets[1]].begin(), 
+                    setmap[setop.sets[1]].end(),
                     back_inserter(lhs));
 
             for(idx = 2; idx <= setop.sets.size() - 1 && !lhs.empty(); ++idx) {
                 name = setop.sets[idx];
                 if(name == "$") {
-                    ihs = set_stack.pop(); 
+                    ihs = set_stack.top(); 
+                    set_stack.pop();
                     set_intersection(lhs.begin(), lhs.end(),
                         ihs.begin(), ihs.end(),
                         back_inserter(rhs));
@@ -82,11 +84,11 @@ int32_t calc(const setmap_t &setmap, const vector<SetOp> & ops) {
         set_stack.push(lhs);
     } // foreach
 
-    ihs = set_stack.pop();
+    ihs = set_stack.top();
     return ihs.size();
 }
 
-void save(const string &filename, const setmap_t &setmap) {
+void save(string &filename, setmap_t &setmap) {
     /**
      * save the `setmap` to `filename` as a plain text file. 
      *
@@ -94,9 +96,9 @@ void save(const string &filename, const setmap_t &setmap) {
      * each set. The first is the set name and the rest are the numbers. 
      */
     ofstream fout(filename.c_str());
-    foreach(const setmap_t::value_type &pair, setmap) {
+    foreach(setmap_t::value_type &pair, setmap) {
         fout << pair.first << " ";
-        foreach(const int32_t value, pair.second) {
+        foreach(int32_t value, pair.second) {
             fout << value << " ";
         }
         fout << endl;
@@ -104,7 +106,7 @@ void save(const string &filename, const setmap_t &setmap) {
     fout.close();
 }
 
-void load(const string &filename, setmap_t &setmap) {
+void load(string &filename, setmap_t &setmap) {
     string line, name;
     vector<string> tokens;
     vector<string>::const_iterator itr;
@@ -129,7 +131,7 @@ void load(const string &filename, setmap_t &setmap) {
 }
 
 void clear(setmap_t &src,
-        const string &name) {
+        string &name) {
     // Return no update if we can't find the set given the `name`
     if(src.find(name) == src.end()) return;
 
@@ -137,8 +139,8 @@ void clear(setmap_t &src,
 }
 
 void add(setmap_t  &src,
-        const string &name,
-        const vector<int32_t> & values) {
+        string &name,
+        vector<int32_t> & values) {
     // Return no update if we can't find the set given the `name`
     if(src.find(name) == src.end()) return;
 
