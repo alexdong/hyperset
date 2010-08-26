@@ -147,9 +147,7 @@ void clear(setmap_t &src,
     src[name].clear();
 }
 
-void add(setmap_t  &src,
-        string &name,
-        vector<int32_t> & values) {
+void add(setmap_t  &src, const string &name, const vector<int32_t> & values) {
     // Return no update if we can't find the set given the `name`
     if(src.find(name) == src.end()) return;
 

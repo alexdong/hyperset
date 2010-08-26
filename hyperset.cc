@@ -28,20 +28,8 @@ uint32_t hyperset_calc_args::read(::apache::thrift::protocol::TProtocol* iprot) 
     switch (fid)
     {
       case 1:
-        if (ftype == ::apache::thrift::protocol::T_LIST) {
-          {
-            this->query.clear();
-            uint32_t _size6;
-            ::apache::thrift::protocol::TType _etype9;
-            iprot->readListBegin(_etype9, _size6);
-            this->query.resize(_size6);
-            uint32_t _i10;
-            for (_i10 = 0; _i10 < _size6; ++_i10)
-            {
-              xfer += this->query[_i10].read(iprot);
-            }
-            iprot->readListEnd();
-          }
+        if (ftype == ::apache::thrift::protocol::T_STRING) {
+          xfer += iprot->readString(this->query);
           this->__isset.query = true;
         } else {
           xfer += iprot->skip(ftype);
@@ -62,16 +50,8 @@ uint32_t hyperset_calc_args::read(::apache::thrift::protocol::TProtocol* iprot) 
 uint32_t hyperset_calc_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("hyperset_calc_args");
-  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_LIST, 1);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, this->query.size());
-    std::vector<SetOp> ::const_iterator _iter11;
-    for (_iter11 = this->query.begin(); _iter11 != this->query.end(); ++_iter11)
-    {
-      xfer += (*_iter11).write(oprot);
-    }
-    xfer += oprot->writeListEnd();
-  }
+  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString(this->query);
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -81,16 +61,8 @@ uint32_t hyperset_calc_args::write(::apache::thrift::protocol::TProtocol* oprot)
 uint32_t hyperset_calc_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
   uint32_t xfer = 0;
   xfer += oprot->writeStructBegin("hyperset_calc_pargs");
-  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_LIST, 1);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, (*(this->query)).size());
-    std::vector<SetOp> ::const_iterator _iter12;
-    for (_iter12 = (*(this->query)).begin(); _iter12 != (*(this->query)).end(); ++_iter12)
-    {
-      xfer += (*_iter12).write(oprot);
-    }
-    xfer += oprot->writeListEnd();
-  }
+  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_STRING, 1);
+  xfer += oprot->writeString((*(this->query)));
   xfer += oprot->writeFieldEnd();
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
@@ -98,226 +70,6 @@ uint32_t hyperset_calc_pargs::write(::apache::thrift::protocol::TProtocol* oprot
 }
 
 uint32_t hyperset_calc_result::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_SET) {
-          {
-            this->success.clear();
-            uint32_t _size13;
-            ::apache::thrift::protocol::TType _etype16;
-            iprot->readSetBegin(_etype16, _size13);
-            uint32_t _i17;
-            for (_i17 = 0; _i17 < _size13; ++_i17)
-            {
-              int32_t _elem18;
-              xfer += iprot->readI32(_elem18);
-              this->success.insert(_elem18);
-            }
-            iprot->readSetEnd();
-          }
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  return xfer;
-}
-
-uint32_t hyperset_calc_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
-
-  uint32_t xfer = 0;
-
-  xfer += oprot->writeStructBegin("hyperset_calc_result");
-
-  if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_SET, 0);
-    {
-      xfer += oprot->writeSetBegin(::apache::thrift::protocol::T_I32, this->success.size());
-      std::set<int32_t> ::const_iterator _iter19;
-      for (_iter19 = this->success.begin(); _iter19 != this->success.end(); ++_iter19)
-      {
-        xfer += oprot->writeI32((*_iter19));
-      }
-      xfer += oprot->writeSetEnd();
-    }
-    xfer += oprot->writeFieldEnd();
-  }
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-uint32_t hyperset_calc_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_SET) {
-          {
-            (*(this->success)).clear();
-            uint32_t _size20;
-            ::apache::thrift::protocol::TType _etype23;
-            iprot->readSetBegin(_etype23, _size20);
-            uint32_t _i24;
-            for (_i24 = 0; _i24 < _size20; ++_i24)
-            {
-              int32_t _elem25;
-              xfer += iprot->readI32(_elem25);
-              (*(this->success)).insert(_elem25);
-            }
-            iprot->readSetEnd();
-          }
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  return xfer;
-}
-
-uint32_t hyperset_count_args::read(::apache::thrift::protocol::TProtocol* iprot) {
-
-  uint32_t xfer = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TType ftype;
-  int16_t fid;
-
-  xfer += iprot->readStructBegin(fname);
-
-  using ::apache::thrift::protocol::TProtocolException;
-
-
-  while (true)
-  {
-    xfer += iprot->readFieldBegin(fname, ftype, fid);
-    if (ftype == ::apache::thrift::protocol::T_STOP) {
-      break;
-    }
-    switch (fid)
-    {
-      case 1:
-        if (ftype == ::apache::thrift::protocol::T_LIST) {
-          {
-            this->query.clear();
-            uint32_t _size26;
-            ::apache::thrift::protocol::TType _etype29;
-            iprot->readListBegin(_etype29, _size26);
-            this->query.resize(_size26);
-            uint32_t _i30;
-            for (_i30 = 0; _i30 < _size26; ++_i30)
-            {
-              xfer += this->query[_i30].read(iprot);
-            }
-            iprot->readListEnd();
-          }
-          this->__isset.query = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
-      default:
-        xfer += iprot->skip(ftype);
-        break;
-    }
-    xfer += iprot->readFieldEnd();
-  }
-
-  xfer += iprot->readStructEnd();
-
-  return xfer;
-}
-
-uint32_t hyperset_count_args::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("hyperset_count_args");
-  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_LIST, 1);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, this->query.size());
-    std::vector<SetOp> ::const_iterator _iter31;
-    for (_iter31 = this->query.begin(); _iter31 != this->query.end(); ++_iter31)
-    {
-      xfer += (*_iter31).write(oprot);
-    }
-    xfer += oprot->writeListEnd();
-  }
-  xfer += oprot->writeFieldEnd();
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-uint32_t hyperset_count_pargs::write(::apache::thrift::protocol::TProtocol* oprot) const {
-  uint32_t xfer = 0;
-  xfer += oprot->writeStructBegin("hyperset_count_pargs");
-  xfer += oprot->writeFieldBegin("query", ::apache::thrift::protocol::T_LIST, 1);
-  {
-    xfer += oprot->writeListBegin(::apache::thrift::protocol::T_STRUCT, (*(this->query)).size());
-    std::vector<SetOp> ::const_iterator _iter32;
-    for (_iter32 = (*(this->query)).begin(); _iter32 != (*(this->query)).end(); ++_iter32)
-    {
-      xfer += (*_iter32).write(oprot);
-    }
-    xfer += oprot->writeListEnd();
-  }
-  xfer += oprot->writeFieldEnd();
-  xfer += oprot->writeFieldStop();
-  xfer += oprot->writeStructEnd();
-  return xfer;
-}
-
-uint32_t hyperset_count_result::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -357,11 +109,11 @@ uint32_t hyperset_count_result::read(::apache::thrift::protocol::TProtocol* ipro
   return xfer;
 }
 
-uint32_t hyperset_count_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
+uint32_t hyperset_calc_result::write(::apache::thrift::protocol::TProtocol* oprot) const {
 
   uint32_t xfer = 0;
 
-  xfer += oprot->writeStructBegin("hyperset_count_result");
+  xfer += oprot->writeStructBegin("hyperset_calc_result");
 
   if (this->__isset.success) {
     xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
@@ -373,7 +125,7 @@ uint32_t hyperset_count_result::write(::apache::thrift::protocol::TProtocol* opr
   return xfer;
 }
 
-uint32_t hyperset_count_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
+uint32_t hyperset_calc_presult::read(::apache::thrift::protocol::TProtocol* iprot) {
 
   uint32_t xfer = 0;
   std::string fname;
@@ -445,14 +197,14 @@ uint32_t hyperset_add_args::read(::apache::thrift::protocol::TProtocol* iprot) {
         if (ftype == ::apache::thrift::protocol::T_LIST) {
           {
             this->vals.clear();
-            uint32_t _size33;
-            ::apache::thrift::protocol::TType _etype36;
-            iprot->readListBegin(_etype36, _size33);
-            this->vals.resize(_size33);
-            uint32_t _i37;
-            for (_i37 = 0; _i37 < _size33; ++_i37)
+            uint32_t _size0;
+            ::apache::thrift::protocol::TType _etype3;
+            iprot->readListBegin(_etype3, _size0);
+            this->vals.resize(_size0);
+            uint32_t _i4;
+            for (_i4 = 0; _i4 < _size0; ++_i4)
             {
-              xfer += iprot->readI32(this->vals[_i37]);
+              xfer += iprot->readI32(this->vals[_i4]);
             }
             iprot->readListEnd();
           }
@@ -482,10 +234,10 @@ uint32_t hyperset_add_args::write(::apache::thrift::protocol::TProtocol* oprot) 
   xfer += oprot->writeFieldBegin("vals", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, this->vals.size());
-    std::vector<int32_t> ::const_iterator _iter38;
-    for (_iter38 = this->vals.begin(); _iter38 != this->vals.end(); ++_iter38)
+    std::vector<int32_t> ::const_iterator _iter5;
+    for (_iter5 = this->vals.begin(); _iter5 != this->vals.end(); ++_iter5)
     {
-      xfer += oprot->writeI32((*_iter38));
+      xfer += oprot->writeI32((*_iter5));
     }
     xfer += oprot->writeListEnd();
   }
@@ -504,10 +256,10 @@ uint32_t hyperset_add_pargs::write(::apache::thrift::protocol::TProtocol* oprot)
   xfer += oprot->writeFieldBegin("vals", ::apache::thrift::protocol::T_LIST, 2);
   {
     xfer += oprot->writeListBegin(::apache::thrift::protocol::T_I32, (*(this->vals)).size());
-    std::vector<int32_t> ::const_iterator _iter39;
-    for (_iter39 = (*(this->vals)).begin(); _iter39 != (*(this->vals)).end(); ++_iter39)
+    std::vector<int32_t> ::const_iterator _iter6;
+    for (_iter6 = (*(this->vals)).begin(); _iter6 != (*(this->vals)).end(); ++_iter6)
     {
-      xfer += oprot->writeI32((*_iter39));
+      xfer += oprot->writeI32((*_iter6));
     }
     xfer += oprot->writeListEnd();
   }
@@ -537,14 +289,6 @@ uint32_t hyperset_add_result::read(::apache::thrift::protocol::TProtocol* iprot)
     }
     switch (fid)
     {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->success);
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -563,11 +307,6 @@ uint32_t hyperset_add_result::write(::apache::thrift::protocol::TProtocol* oprot
 
   xfer += oprot->writeStructBegin("hyperset_add_result");
 
-  if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
-    xfer += oprot->writeI32(this->success);
-    xfer += oprot->writeFieldEnd();
-  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -593,14 +332,6 @@ uint32_t hyperset_add_presult::read(::apache::thrift::protocol::TProtocol* iprot
     }
     switch (fid)
     {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32((*(this->success)));
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -681,14 +412,6 @@ uint32_t hyperset_save_result::read(::apache::thrift::protocol::TProtocol* iprot
     }
     switch (fid)
     {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32(this->success);
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -707,11 +430,6 @@ uint32_t hyperset_save_result::write(::apache::thrift::protocol::TProtocol* opro
 
   xfer += oprot->writeStructBegin("hyperset_save_result");
 
-  if (this->__isset.success) {
-    xfer += oprot->writeFieldBegin("success", ::apache::thrift::protocol::T_I32, 0);
-    xfer += oprot->writeI32(this->success);
-    xfer += oprot->writeFieldEnd();
-  }
   xfer += oprot->writeFieldStop();
   xfer += oprot->writeStructEnd();
   return xfer;
@@ -737,14 +455,6 @@ uint32_t hyperset_save_presult::read(::apache::thrift::protocol::TProtocol* ipro
     }
     switch (fid)
     {
-      case 0:
-        if (ftype == ::apache::thrift::protocol::T_I32) {
-          xfer += iprot->readI32((*(this->success)));
-          this->__isset.success = true;
-        } else {
-          xfer += iprot->skip(ftype);
-        }
-        break;
       default:
         xfer += iprot->skip(ftype);
         break;
@@ -757,13 +467,13 @@ uint32_t hyperset_save_presult::read(::apache::thrift::protocol::TProtocol* ipro
   return xfer;
 }
 
-void hypersetClient::calc(std::set<int32_t> & _return, const std::vector<SetOp> & query)
+int32_t hypersetClient::calc(const std::string& query)
 {
   send_calc(query);
-  recv_calc(_return);
+  return recv_calc();
 }
 
-void hypersetClient::send_calc(const std::vector<SetOp> & query)
+void hypersetClient::send_calc(const std::string& query)
 {
   int32_t cseqid = 0;
   oprot_->writeMessageBegin("calc", ::apache::thrift::protocol::T_CALL, cseqid);
@@ -777,7 +487,7 @@ void hypersetClient::send_calc(const std::vector<SetOp> & query)
   oprot_->getTransport()->writeEnd();
 }
 
-void hypersetClient::recv_calc(std::set<int32_t> & _return)
+int32_t hypersetClient::recv_calc()
 {
 
   int32_t rseqid = 0;
@@ -804,68 +514,8 @@ void hypersetClient::recv_calc(std::set<int32_t> & _return)
     iprot_->getTransport()->readEnd();
     throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::WRONG_METHOD_NAME);
   }
-  hyperset_calc_presult result;
-  result.success = &_return;
-  result.read(iprot_);
-  iprot_->readMessageEnd();
-  iprot_->getTransport()->readEnd();
-
-  if (result.__isset.success) {
-    // _return pointer has now been filled
-    return;
-  }
-  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "calc failed: unknown result");
-}
-
-int32_t hypersetClient::count(const std::vector<SetOp> & query)
-{
-  send_count(query);
-  return recv_count();
-}
-
-void hypersetClient::send_count(const std::vector<SetOp> & query)
-{
-  int32_t cseqid = 0;
-  oprot_->writeMessageBegin("count", ::apache::thrift::protocol::T_CALL, cseqid);
-
-  hyperset_count_pargs args;
-  args.query = &query;
-  args.write(oprot_);
-
-  oprot_->writeMessageEnd();
-  oprot_->getTransport()->flush();
-  oprot_->getTransport()->writeEnd();
-}
-
-int32_t hypersetClient::recv_count()
-{
-
-  int32_t rseqid = 0;
-  std::string fname;
-  ::apache::thrift::protocol::TMessageType mtype;
-
-  iprot_->readMessageBegin(fname, mtype, rseqid);
-  if (mtype == ::apache::thrift::protocol::T_EXCEPTION) {
-    ::apache::thrift::TApplicationException x;
-    x.read(iprot_);
-    iprot_->readMessageEnd();
-    iprot_->getTransport()->readEnd();
-    throw x;
-  }
-  if (mtype != ::apache::thrift::protocol::T_REPLY) {
-    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
-    iprot_->readMessageEnd();
-    iprot_->getTransport()->readEnd();
-    throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::INVALID_MESSAGE_TYPE);
-  }
-  if (fname.compare("count") != 0) {
-    iprot_->skip(::apache::thrift::protocol::T_STRUCT);
-    iprot_->readMessageEnd();
-    iprot_->getTransport()->readEnd();
-    throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::WRONG_METHOD_NAME);
-  }
   int32_t _return;
-  hyperset_count_presult result;
+  hyperset_calc_presult result;
   result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
@@ -874,13 +524,13 @@ int32_t hypersetClient::recv_count()
   if (result.__isset.success) {
     return _return;
   }
-  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "count failed: unknown result");
+  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "calc failed: unknown result");
 }
 
-int32_t hypersetClient::add(const std::string& name, const std::vector<int32_t> & vals)
+void hypersetClient::add(const std::string& name, const std::vector<int32_t> & vals)
 {
   send_add(name, vals);
-  return recv_add();
+  recv_add();
 }
 
 void hypersetClient::send_add(const std::string& name, const std::vector<int32_t> & vals)
@@ -898,7 +548,7 @@ void hypersetClient::send_add(const std::string& name, const std::vector<int32_t
   oprot_->getTransport()->writeEnd();
 }
 
-int32_t hypersetClient::recv_add()
+void hypersetClient::recv_add()
 {
 
   int32_t rseqid = 0;
@@ -925,23 +575,18 @@ int32_t hypersetClient::recv_add()
     iprot_->getTransport()->readEnd();
     throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::WRONG_METHOD_NAME);
   }
-  int32_t _return;
   hyperset_add_presult result;
-  result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
   iprot_->getTransport()->readEnd();
 
-  if (result.__isset.success) {
-    return _return;
-  }
-  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "add failed: unknown result");
+  return;
 }
 
-int32_t hypersetClient::save()
+void hypersetClient::save()
 {
   send_save();
-  return recv_save();
+  recv_save();
 }
 
 void hypersetClient::send_save()
@@ -957,7 +602,7 @@ void hypersetClient::send_save()
   oprot_->getTransport()->writeEnd();
 }
 
-int32_t hypersetClient::recv_save()
+void hypersetClient::recv_save()
 {
 
   int32_t rseqid = 0;
@@ -984,17 +629,12 @@ int32_t hypersetClient::recv_save()
     iprot_->getTransport()->readEnd();
     throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::WRONG_METHOD_NAME);
   }
-  int32_t _return;
   hyperset_save_presult result;
-  result.success = &_return;
   result.read(iprot_);
   iprot_->readMessageEnd();
   iprot_->getTransport()->readEnd();
 
-  if (result.__isset.success) {
-    return _return;
-  }
-  throw ::apache::thrift::TApplicationException(::apache::thrift::TApplicationException::MISSING_RESULT, "save failed: unknown result");
+  return;
 }
 
 bool hypersetProcessor::process(boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot, boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot) {
@@ -1051,7 +691,7 @@ void hypersetProcessor::process_calc(int32_t seqid, ::apache::thrift::protocol::
 
   hyperset_calc_result result;
   try {
-    iface_->calc(result.success, args.query);
+    result.success = iface_->calc(args.query);
     result.__isset.success = true;
   } catch (const std::exception& e) {
     ::apache::thrift::TApplicationException x(e.what());
@@ -1070,34 +710,6 @@ void hypersetProcessor::process_calc(int32_t seqid, ::apache::thrift::protocol::
   oprot->getTransport()->writeEnd();
 }
 
-void hypersetProcessor::process_count(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot)
-{
-  hyperset_count_args args;
-  args.read(iprot);
-  iprot->readMessageEnd();
-  iprot->getTransport()->readEnd();
-
-  hyperset_count_result result;
-  try {
-    result.success = iface_->count(args.query);
-    result.__isset.success = true;
-  } catch (const std::exception& e) {
-    ::apache::thrift::TApplicationException x(e.what());
-    oprot->writeMessageBegin("count", ::apache::thrift::protocol::T_EXCEPTION, seqid);
-    x.write(oprot);
-    oprot->writeMessageEnd();
-    oprot->getTransport()->flush();
-    oprot->getTransport()->writeEnd();
-    return;
-  }
-
-  oprot->writeMessageBegin("count", ::apache::thrift::protocol::T_REPLY, seqid);
-  result.write(oprot);
-  oprot->writeMessageEnd();
-  oprot->getTransport()->flush();
-  oprot->getTransport()->writeEnd();
-}
-
 void hypersetProcessor::process_add(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot)
 {
   hyperset_add_args args;
@@ -1107,8 +719,7 @@ void hypersetProcessor::process_add(int32_t seqid, ::apache::thrift::protocol::T
 
   hyperset_add_result result;
   try {
-    result.success = iface_->add(args.name, args.vals);
-    result.__isset.success = true;
+    iface_->add(args.name, args.vals);
   } catch (const std::exception& e) {
     ::apache::thrift::TApplicationException x(e.what());
     oprot->writeMessageBegin("add", ::apache::thrift::protocol::T_EXCEPTION, seqid);
@@ -1135,8 +746,7 @@ void hypersetProcessor::process_save(int32_t seqid, ::apache::thrift::protocol::
 
   hyperset_save_result result;
   try {
-    result.success = iface_->save();
-    result.__isset.success = true;
+    iface_->save();
   } catch (const std::exception& e) {
     ::apache::thrift::TApplicationException x(e.what());
     oprot->writeMessageBegin("save", ::apache::thrift::protocol::T_EXCEPTION, seqid);

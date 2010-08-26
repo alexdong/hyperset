@@ -4,7 +4,6 @@
 
 BOOST_INCLUDE_DIR=/user/include/boost/
 THRIFT_INCLUDE_DIR=/usr/local/include/thrift
-THRIFT_LIB=thrift
 
 PLATFORM := $(shell uname -m)
 ifeq ($(PLATFORM), i686)
@@ -27,7 +26,8 @@ CXXFLAGS=-I$(THRIFT_INCLUDE_DIR) \
 all: test
 
 server: core.o $(SERVER_OBJECTS)
-	$(CXX) -o hyperset core.o $(SERVER_OBJECTS) $(LDFLAGS) -l$(THRIFT) -ltcmalloc
+	$(CXX) -o hyperset core.o $(SERVER_OBJECTS) $(LDFLAGS) \
+		-lthrift -lthriftnb -levent -ltcmalloc
 
 test: core.o test.o
 	$(CXX) -o test test.o core.o $(LDFLAGS) -l$(BOOST_UNIT_TEST_FRAMEWORK)
@@ -39,6 +39,7 @@ test: core.o test.o
 thrift: clean
 	thrift -strict -gen cpp hyperset.thrift
 	thrift -strict -gen py hyperset.thrift
+	./migrate_thrift.sh
 
 clean:
 	rm -f hyperset core test *.o *.out *.gcda *.gcno *.d app.info tags

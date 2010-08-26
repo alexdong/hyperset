@@ -23,13 +23,6 @@ class Iface:
     """
     pass
 
-  def count(self, query):
-    """
-    Parameters:
-     - query
-    """
-    pass
-
   def add(self, name, vals):
     """
     Parameters:
@@ -79,36 +72,6 @@ class Client(Iface):
       return result.success
     raise TApplicationException(TApplicationException.MISSING_RESULT, "calc failed: unknown result");
 
-  def count(self, query):
-    """
-    Parameters:
-     - query
-    """
-    self.send_count(query)
-    return self.recv_count()
-
-  def send_count(self, query):
-    self._oprot.writeMessageBegin('count', TMessageType.CALL, self._seqid)
-    args = count_args()
-    args.query = query
-    args.write(self._oprot)
-    self._oprot.writeMessageEnd()
-    self._oprot.trans.flush()
-
-  def recv_count(self, ):
-    (fname, mtype, rseqid) = self._iprot.readMessageBegin()
-    if mtype == TMessageType.EXCEPTION:
-      x = TApplicationException()
-      x.read(self._iprot)
-      self._iprot.readMessageEnd()
-      raise x
-    result = count_result()
-    result.read(self._iprot)
-    self._iprot.readMessageEnd()
-    if result.success != None:
-      return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "count failed: unknown result");
-
   def add(self, name, vals):
     """
     Parameters:
@@ -116,7 +79,7 @@ class Client(Iface):
      - vals
     """
     self.send_add(name, vals)
-    return self.recv_add()
+    self.recv_add()
 
   def send_add(self, name, vals):
     self._oprot.writeMessageBegin('add', TMessageType.CALL, self._seqid)
@@ -137,13 +100,11 @@ class Client(Iface):
     result = add_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
-    if result.success != None:
-      return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "add failed: unknown result");
+    return
 
   def save(self, ):
     self.send_save()
-    return self.recv_save()
+    self.recv_save()
 
   def send_save(self, ):
     self._oprot.writeMessageBegin('save', TMessageType.CALL, self._seqid)
@@ -162,9 +123,7 @@ class Client(Iface):
     result = save_result()
     result.read(self._iprot)
     self._iprot.readMessageEnd()
-    if result.success != None:
-      return result.success
-    raise TApplicationException(TApplicationException.MISSING_RESULT, "save failed: unknown result");
+    return
 
 
 class Processor(Iface, TProcessor):
@@ -172,7 +131,6 @@ class Processor(Iface, TProcessor):
     self._handler = handler
     self._processMap = {}
     self._processMap["calc"] = Processor.process_calc
-    self._processMap["count"] = Processor.process_count
     self._processMap["add"] = Processor.process_add
     self._processMap["save"] = Processor.process_save
 
@@ -202,23 +160,12 @@ class Processor(Iface, TProcessor):
     oprot.writeMessageEnd()
     oprot.trans.flush()
 
-  def process_count(self, seqid, iprot, oprot):
-    args = count_args()
-    args.read(iprot)
-    iprot.readMessageEnd()
-    result = count_result()
-    result.success = self._handler.count(args.query)
-    oprot.writeMessageBegin("count", TMessageType.REPLY, seqid)
-    result.write(oprot)
-    oprot.writeMessageEnd()
-    oprot.trans.flush()
-
   def process_add(self, seqid, iprot, oprot):
     args = add_args()
     args.read(iprot)
     iprot.readMessageEnd()
     result = add_result()
-    result.success = self._handler.add(args.name, args.vals)
+    self._handler.add(args.name, args.vals)
     oprot.writeMessageBegin("add", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -229,7 +176,7 @@ class Processor(Iface, TProcessor):
     args.read(iprot)
     iprot.readMessageEnd()
     result = save_result()
-    result.success = self._handler.save()
+    self._handler.save()
     oprot.writeMessageBegin("save", TMessageType.REPLY, seqid)
     result.write(oprot)
     oprot.writeMessageEnd()
@@ -246,7 +193,7 @@ class calc_args:
 
   thrift_spec = (
     None, # 0
-    (1, TType.LIST, 'query', (TType.STRUCT,(SetOp, SetOp.thrift_spec)), None, ), # 1
+    (1, TType.STRING, 'query', None, None, ), # 1
   )
 
   def __init__(self, query=None,):
@@ -262,14 +209,8 @@ class calc_args:
       if ftype == TType.STOP:
         break
       if fid == 1:
-        if ftype == TType.LIST:
-          self.query = []
-          (_etype10, _size7) = iprot.readListBegin()
-          for _i11 in xrange(_size7):
-            _elem12 = SetOp()
-            _elem12.read(iprot)
-            self.query.append(_elem12)
-          iprot.readListEnd()
+        if ftype == TType.STRING:
+          self.query = iprot.readString();
         else:
           iprot.skip(ftype)
       else:
@@ -283,11 +224,8 @@ class calc_args:
       return
     oprot.writeStructBegin('calc_args')
     if self.query != None:
-      oprot.writeFieldBegin('query', TType.LIST, 1)
-      oprot.writeListBegin(TType.STRUCT, len(self.query))
-      for iter13 in self.query:
-        iter13.write(oprot)
-      oprot.writeListEnd()
+      oprot.writeFieldBegin('query', TType.STRING, 1)
+      oprot.writeString(self.query)
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
@@ -304,134 +242,6 @@ class calc_args:
     return not (self == other)
 
 class calc_result:
-  """
-  Attributes:
-   - success
-  """
-
-  thrift_spec = (
-    (0, TType.SET, 'success', (TType.I32,None), None, ), # 0
-  )
-
-  def __init__(self, success=None,):
-    self.success = success
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 0:
-        if ftype == TType.SET:
-          self.success = set()
-          (_etype17, _size14) = iprot.readSetBegin()
-          for _i18 in xrange(_size14):
-            _elem19 = iprot.readI32();
-            self.success.add(_elem19)
-          iprot.readSetEnd()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('calc_result')
-    if self.success != None:
-      oprot.writeFieldBegin('success', TType.SET, 0)
-      oprot.writeSetBegin(TType.I32, len(self.success))
-      for iter20 in self.success:
-        oprot.writeI32(iter20)
-      oprot.writeSetEnd()
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class count_args:
-  """
-  Attributes:
-   - query
-  """
-
-  thrift_spec = (
-    None, # 0
-    (1, TType.LIST, 'query', (TType.STRUCT,(SetOp, SetOp.thrift_spec)), None, ), # 1
-  )
-
-  def __init__(self, query=None,):
-    self.query = query
-
-  def read(self, iprot):
-    if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
-      fastbinary.decode_binary(self, iprot.trans, (self.__class__, self.thrift_spec))
-      return
-    iprot.readStructBegin()
-    while True:
-      (fname, ftype, fid) = iprot.readFieldBegin()
-      if ftype == TType.STOP:
-        break
-      if fid == 1:
-        if ftype == TType.LIST:
-          self.query = []
-          (_etype24, _size21) = iprot.readListBegin()
-          for _i25 in xrange(_size21):
-            _elem26 = SetOp()
-            _elem26.read(iprot)
-            self.query.append(_elem26)
-          iprot.readListEnd()
-        else:
-          iprot.skip(ftype)
-      else:
-        iprot.skip(ftype)
-      iprot.readFieldEnd()
-    iprot.readStructEnd()
-
-  def write(self, oprot):
-    if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
-      oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
-      return
-    oprot.writeStructBegin('count_args')
-    if self.query != None:
-      oprot.writeFieldBegin('query', TType.LIST, 1)
-      oprot.writeListBegin(TType.STRUCT, len(self.query))
-      for iter27 in self.query:
-        iter27.write(oprot)
-      oprot.writeListEnd()
-      oprot.writeFieldEnd()
-    oprot.writeFieldStop()
-    oprot.writeStructEnd()
-
-  def __repr__(self):
-    L = ['%s=%r' % (key, value)
-      for key, value in self.__dict__.iteritems()]
-    return '%s(%s)' % (self.__class__.__name__, ', '.join(L))
-
-  def __eq__(self, other):
-    return isinstance(other, self.__class__) and self.__dict__ == other.__dict__
-
-  def __ne__(self, other):
-    return not (self == other)
-
-class count_result:
   """
   Attributes:
    - success
@@ -467,7 +277,7 @@ class count_result:
     if oprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and self.thrift_spec is not None and fastbinary is not None:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
-    oprot.writeStructBegin('count_result')
+    oprot.writeStructBegin('calc_result')
     if self.success != None:
       oprot.writeFieldBegin('success', TType.I32, 0)
       oprot.writeI32(self.success)
@@ -520,10 +330,10 @@ class add_args:
       elif fid == 2:
         if ftype == TType.LIST:
           self.vals = []
-          (_etype31, _size28) = iprot.readListBegin()
-          for _i32 in xrange(_size28):
-            _elem33 = iprot.readI32();
-            self.vals.append(_elem33)
+          (_etype3, _size0) = iprot.readListBegin()
+          for _i4 in xrange(_size0):
+            _elem5 = iprot.readI32();
+            self.vals.append(_elem5)
           iprot.readListEnd()
         else:
           iprot.skip(ftype)
@@ -544,8 +354,8 @@ class add_args:
     if self.vals != None:
       oprot.writeFieldBegin('vals', TType.LIST, 2)
       oprot.writeListBegin(TType.I32, len(self.vals))
-      for iter34 in self.vals:
-        oprot.writeI32(iter34)
+      for iter6 in self.vals:
+        oprot.writeI32(iter6)
       oprot.writeListEnd()
       oprot.writeFieldEnd()
     oprot.writeFieldStop()
@@ -563,17 +373,9 @@ class add_args:
     return not (self == other)
 
 class add_result:
-  """
-  Attributes:
-   - success
-  """
 
   thrift_spec = (
-    (0, TType.I32, 'success', None, None, ), # 0
   )
-
-  def __init__(self, success=None,):
-    self.success = success
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -584,11 +386,6 @@ class add_result:
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.I32:
-          self.success = iprot.readI32();
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -599,10 +396,6 @@ class add_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('add_result')
-    if self.success != None:
-      oprot.writeFieldBegin('success', TType.I32, 0)
-      oprot.writeI32(self.success)
-      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 
@@ -656,17 +449,9 @@ class save_args:
     return not (self == other)
 
 class save_result:
-  """
-  Attributes:
-   - success
-  """
 
   thrift_spec = (
-    (0, TType.I32, 'success', None, None, ), # 0
   )
-
-  def __init__(self, success=None,):
-    self.success = success
 
   def read(self, iprot):
     if iprot.__class__ == TBinaryProtocol.TBinaryProtocolAccelerated and isinstance(iprot.trans, TTransport.CReadableTransport) and self.thrift_spec is not None and fastbinary is not None:
@@ -677,11 +462,6 @@ class save_result:
       (fname, ftype, fid) = iprot.readFieldBegin()
       if ftype == TType.STOP:
         break
-      if fid == 0:
-        if ftype == TType.I32:
-          self.success = iprot.readI32();
-        else:
-          iprot.skip(ftype)
       else:
         iprot.skip(ftype)
       iprot.readFieldEnd()
@@ -692,10 +472,6 @@ class save_result:
       oprot.trans.write(fastbinary.encode_binary(self, (self.__class__, self.thrift_spec)))
       return
     oprot.writeStructBegin('save_result')
-    if self.success != None:
-      oprot.writeFieldBegin('success', TType.I32, 0)
-      oprot.writeI32(self.success)
-      oprot.writeFieldEnd()
     oprot.writeFieldStop()
     oprot.writeStructEnd()
 

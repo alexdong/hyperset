@@ -14,41 +14,35 @@ namespace hyperset {
 class hypersetIf {
  public:
   virtual ~hypersetIf() {}
-  virtual void calc(std::set<int32_t> & _return, const std::vector<SetOp> & query) = 0;
-  virtual int32_t count(const std::vector<SetOp> & query) = 0;
-  virtual int32_t add(const std::string& name, const std::vector<int32_t> & vals) = 0;
-  virtual int32_t save() = 0;
+  virtual int32_t calc(const std::string& query) = 0;
+  virtual void add(const std::string& name, const std::vector<int32_t> & vals) = 0;
+  virtual void save() = 0;
 };
 
 class hypersetNull : virtual public hypersetIf {
  public:
   virtual ~hypersetNull() {}
-  void calc(std::set<int32_t> & /* _return */, const std::vector<SetOp> & /* query */) {
+  int32_t calc(const std::string& /* query */) {
+    int32_t _return = 0;
+    return _return;
+  }
+  void add(const std::string& /* name */, const std::vector<int32_t> & /* vals */) {
     return;
   }
-  int32_t count(const std::vector<SetOp> & /* query */) {
-    int32_t _return = 0;
-    return _return;
-  }
-  int32_t add(const std::string& /* name */, const std::vector<int32_t> & /* vals */) {
-    int32_t _return = 0;
-    return _return;
-  }
-  int32_t save() {
-    int32_t _return = 0;
-    return _return;
+  void save() {
+    return;
   }
 };
 
 class hyperset_calc_args {
  public:
 
-  hyperset_calc_args() {
+  hyperset_calc_args() : query("") {
   }
 
   virtual ~hyperset_calc_args() throw() {}
 
-  std::vector<SetOp>  query;
+  std::string query;
 
   struct __isset {
     __isset() : query(false) {}
@@ -78,7 +72,7 @@ class hyperset_calc_pargs {
 
   virtual ~hyperset_calc_pargs() throw() {}
 
-  const std::vector<SetOp> * query;
+  const std::string* query;
 
   uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
 
@@ -87,12 +81,12 @@ class hyperset_calc_pargs {
 class hyperset_calc_result {
  public:
 
-  hyperset_calc_result() {
+  hyperset_calc_result() : success(0) {
   }
 
   virtual ~hyperset_calc_result() throw() {}
 
-  std::set<int32_t>  success;
+  int32_t success;
 
   struct __isset {
     __isset() : success(false) {}
@@ -121,99 +115,6 @@ class hyperset_calc_presult {
 
 
   virtual ~hyperset_calc_presult() throw() {}
-
-  std::set<int32_t> * success;
-
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-
-};
-
-class hyperset_count_args {
- public:
-
-  hyperset_count_args() {
-  }
-
-  virtual ~hyperset_count_args() throw() {}
-
-  std::vector<SetOp>  query;
-
-  struct __isset {
-    __isset() : query(false) {}
-    bool query;
-  } __isset;
-
-  bool operator == (const hyperset_count_args & rhs) const
-  {
-    if (!(query == rhs.query))
-      return false;
-    return true;
-  }
-  bool operator != (const hyperset_count_args &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const hyperset_count_args & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-class hyperset_count_pargs {
- public:
-
-
-  virtual ~hyperset_count_pargs() throw() {}
-
-  const std::vector<SetOp> * query;
-
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-class hyperset_count_result {
- public:
-
-  hyperset_count_result() : success(0) {
-  }
-
-  virtual ~hyperset_count_result() throw() {}
-
-  int32_t success;
-
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
-
-  bool operator == (const hyperset_count_result & rhs) const
-  {
-    if (!(success == rhs.success))
-      return false;
-    return true;
-  }
-  bool operator != (const hyperset_count_result &rhs) const {
-    return !(*this == rhs);
-  }
-
-  bool operator < (const hyperset_count_result & ) const;
-
-  uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
-  uint32_t write(::apache::thrift::protocol::TProtocol* oprot) const;
-
-};
-
-class hyperset_count_presult {
- public:
-
-
-  virtual ~hyperset_count_presult() throw() {}
 
   int32_t* success;
 
@@ -278,22 +179,14 @@ class hyperset_add_pargs {
 class hyperset_add_result {
  public:
 
-  hyperset_add_result() : success(0) {
+  hyperset_add_result() {
   }
 
   virtual ~hyperset_add_result() throw() {}
 
-  int32_t success;
 
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
-
-  bool operator == (const hyperset_add_result & rhs) const
+  bool operator == (const hyperset_add_result & /* rhs */) const
   {
-    if (!(success == rhs.success))
-      return false;
     return true;
   }
   bool operator != (const hyperset_add_result &rhs) const {
@@ -313,12 +206,6 @@ class hyperset_add_presult {
 
   virtual ~hyperset_add_presult() throw() {}
 
-  int32_t* success;
-
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -362,22 +249,14 @@ class hyperset_save_pargs {
 class hyperset_save_result {
  public:
 
-  hyperset_save_result() : success(0) {
+  hyperset_save_result() {
   }
 
   virtual ~hyperset_save_result() throw() {}
 
-  int32_t success;
 
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
-
-  bool operator == (const hyperset_save_result & rhs) const
+  bool operator == (const hyperset_save_result & /* rhs */) const
   {
-    if (!(success == rhs.success))
-      return false;
     return true;
   }
   bool operator != (const hyperset_save_result &rhs) const {
@@ -397,12 +276,6 @@ class hyperset_save_presult {
 
   virtual ~hyperset_save_presult() throw() {}
 
-  int32_t* success;
-
-  struct __isset {
-    __isset() : success(false) {}
-    bool success;
-  } __isset;
 
   uint32_t read(::apache::thrift::protocol::TProtocol* iprot);
 
@@ -428,18 +301,15 @@ class hypersetClient : virtual public hypersetIf {
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> getOutputProtocol() {
     return poprot_;
   }
-  void calc(std::set<int32_t> & _return, const std::vector<SetOp> & query);
-  void send_calc(const std::vector<SetOp> & query);
-  void recv_calc(std::set<int32_t> & _return);
-  int32_t count(const std::vector<SetOp> & query);
-  void send_count(const std::vector<SetOp> & query);
-  int32_t recv_count();
-  int32_t add(const std::string& name, const std::vector<int32_t> & vals);
+  int32_t calc(const std::string& query);
+  void send_calc(const std::string& query);
+  int32_t recv_calc();
+  void add(const std::string& name, const std::vector<int32_t> & vals);
   void send_add(const std::string& name, const std::vector<int32_t> & vals);
-  int32_t recv_add();
-  int32_t save();
+  void recv_add();
+  void save();
   void send_save();
-  int32_t recv_save();
+  void recv_save();
  protected:
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> piprot_;
   boost::shared_ptr< ::apache::thrift::protocol::TProtocol> poprot_;
@@ -454,14 +324,12 @@ class hypersetProcessor : virtual public ::apache::thrift::TProcessor {
  private:
   std::map<std::string, void (hypersetProcessor::*)(int32_t, ::apache::thrift::protocol::TProtocol*, ::apache::thrift::protocol::TProtocol*)> processMap_;
   void process_calc(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot);
-  void process_count(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot);
   void process_add(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot);
   void process_save(int32_t seqid, ::apache::thrift::protocol::TProtocol* iprot, ::apache::thrift::protocol::TProtocol* oprot);
  public:
   hypersetProcessor(boost::shared_ptr<hypersetIf> iface) :
     iface_(iface) {
     processMap_["calc"] = &hypersetProcessor::process_calc;
-    processMap_["count"] = &hypersetProcessor::process_count;
     processMap_["add"] = &hypersetProcessor::process_add;
     processMap_["save"] = &hypersetProcessor::process_save;
   }
@@ -482,48 +350,28 @@ class hypersetMultiface : virtual public hypersetIf {
     ifaces_.push_back(iface);
   }
  public:
-  void calc(std::set<int32_t> & _return, const std::vector<SetOp> & query) {
+  int32_t calc(const std::string& query) {
     uint32_t sz = ifaces_.size();
     for (uint32_t i = 0; i < sz; ++i) {
       if (i == sz - 1) {
-        ifaces_[i]->calc(_return, query);
-        return;
+        return ifaces_[i]->calc(query);
       } else {
-        ifaces_[i]->calc(_return, query);
+        ifaces_[i]->calc(query);
       }
     }
   }
 
-  int32_t count(const std::vector<SetOp> & query) {
+  void add(const std::string& name, const std::vector<int32_t> & vals) {
     uint32_t sz = ifaces_.size();
     for (uint32_t i = 0; i < sz; ++i) {
-      if (i == sz - 1) {
-        return ifaces_[i]->count(query);
-      } else {
-        ifaces_[i]->count(query);
-      }
+      ifaces_[i]->add(name, vals);
     }
   }
 
-  int32_t add(const std::string& name, const std::vector<int32_t> & vals) {
+  void save() {
     uint32_t sz = ifaces_.size();
     for (uint32_t i = 0; i < sz; ++i) {
-      if (i == sz - 1) {
-        return ifaces_[i]->add(name, vals);
-      } else {
-        ifaces_[i]->add(name, vals);
-      }
-    }
-  }
-
-  int32_t save() {
-    uint32_t sz = ifaces_.size();
-    for (uint32_t i = 0; i < sz; ++i) {
-      if (i == sz - 1) {
-        return ifaces_[i]->save();
-      } else {
-        ifaces_[i]->save();
-      }
+      ifaces_[i]->save();
     }
   }
 
